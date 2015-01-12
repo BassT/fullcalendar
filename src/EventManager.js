@@ -20,6 +20,7 @@ function EventManager(options) { // assumed to be a calendar
 	t.addEventSource = addEventSource;
 	t.removeEventSource = removeEventSource;
 	t.updateEvent = updateEvent;
+	t.updateEvents = updateEvents;
 	t.renderEvent = renderEvent;
 	t.removeEvents = removeEvents;
 	t.clientEvents = clientEvents;
@@ -319,6 +320,23 @@ function EventManager(options) { // assumed to be a calendar
 	/* Manipulation
 	-----------------------------------------------------------------------------*/
 
+	function updateEvents(events) {
+
+		for(var i = 0; i < events.length; i++) {
+			// massage start/end values, even if date string values
+			events[i].start = t.moment(events[i].start);
+			if (events[i].end) {
+				events[i].end = t.moment(events[i].end);
+			}
+			else {
+				events[i].end = null;
+			}
+
+			mutateEvent(events[i], getMiscEventProps(events[i]));
+		}
+		reportEvents(cache); // reports event modifications (so we can redraw)
+
+	}
 
 	// Only ever called from the externally-facing API
 	function updateEvent(event) {
