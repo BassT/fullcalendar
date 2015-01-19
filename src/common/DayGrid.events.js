@@ -228,14 +228,12 @@ DayGrid.mixin({
 	buildSegLevels: function(segs) {
 		var levels = [];
 		var levelsByWorkingArea = {};
-		var i, seg;
-		var j;
-		var k;
+		var i, j, k, workingArea, seg;
 		var workingAreas = [];
 
 		// setup temporary levels grouped by working area
 		for(i = 0; i < segs.length; i++) {
-			var workingArea = segs[i].event.title;
+			workingArea = segs[i].event.title;
 			if (!levelsByWorkingArea.hasOwnProperty(workingArea)) {
 				workingAreas.push(workingArea);
 				levelsByWorkingArea[workingArea] = [];
@@ -244,7 +242,6 @@ DayGrid.mixin({
 
 		console.log("levelsByWorkingArea");
 		console.log(levelsByWorkingArea);
-		debugger;
 
 		// Give preference to elements with certain criteria, so they have
 		// a chance to be closer to the top.
@@ -253,7 +250,6 @@ DayGrid.mixin({
 		segs.sort(compareSegs);
 		console.log("segs after sort");
 		console.log(segs);
-		debugger;
 
 		for (i = 0; i < segs.length; i++) {
 			seg = segs[i];
@@ -274,16 +270,14 @@ DayGrid.mixin({
 
 		console.log("filled levelsByWorkingArea");
 		console.log(levelsByWorkingArea);
-		debugger;
 
 		// concatenate levels by working area and add empty row
-		for (workingArea in workingAreas) {
-			levels.concat(levelsByWorkingArea[workingArea], []);
+		for (i = 0; i < workingAreas.length; i++) {
+			levels = levels.concat(levelsByWorkingArea[workingAreas[i]], []);
 		}
 
 		console.log("concatenated levels");
 		console.log(levels);
-		debugger;
 
 		// assign level property to each segment
 		for (i = 0; i < levels.length; i++) {
@@ -294,7 +288,6 @@ DayGrid.mixin({
 
 		console.log("assigned level property to segs");
 		console.log(segs);
-		debugger;
 
 		// order segments left-to-right. very important if calendar is RTL
 		for (j = 0; j < levels.length; j++) {
@@ -303,7 +296,6 @@ DayGrid.mixin({
 
 		console.log("ordered segments left-to-right");
 		console.log(segs);
-		debugger;
 
 		return levels;
 	},
