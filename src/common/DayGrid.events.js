@@ -227,33 +227,83 @@ DayGrid.mixin({
 	// Stacks a flat array of segments, which are all assumed to be in the same row, into subarrays of vertical levels.
 	buildSegLevels: function(segs) {
 		var levels = [];
+		var levelsByWorkingArea = {};
 		var i, seg;
 		var j;
+		var k;
+		var workingAreas = [];
+
+		// setup temporary levels grouped by working area
+		for(i = 0; i < segs.length; i++) {
+			var workingArea = segs[i].event.title;
+			if (!levelsByWorkingArea.hasOwnProperty(workingArea)) {
+				workingAreas.push(workingArea);
+				levelsByWorkingArea[workingArea] = [];
+			}
+		}
+
+		console.log("levelsByWorkingArea");
+		console.log(levelsByWorkingArea);
+		debugger;
 
 		// Give preference to elements with certain criteria, so they have
 		// a chance to be closer to the top.
+		console.log("segs before sort");
+		console.log(segs);
 		segs.sort(compareSegs);
-		
+		console.log("segs after sort");
+		console.log(segs);
+		debugger;
+
 		for (i = 0; i < segs.length; i++) {
 			seg = segs[i];
+			workingArea = seg.event.title;
 
 			// loop through levels, starting with the topmost, until the segment doesn't collide with other segments
-			for (j = 0; j < levels.length; j++) {
-				if (!isDaySegCollision(seg, levels[j])) {
+			for (k = 0; k < levelsByWorkingArea[workingArea].length; k++) {
+				if (!isDaySegCollision(seg, levelsByWorkingArea[workingArea][k])) {
 					break;
 				}
 			}
-			// `j` now holds the desired subrow index
-			seg.level = j;
+			// `k` now holds the desired subrow index
+			seg.levelByWorkingArea = k;
 
 			// create new level array if needed and append segment
-			(levels[j] || (levels[j] = [])).push(seg);
+			(levelsByWorkingArea[workingArea][k] || (levelsByWorkingArea[workingArea][k] = [])).push(seg);
 		}
+
+		console.log("filled levelsByWorkingArea");
+		console.log(levelsByWorkingArea);
+		debugger;
+
+		// concatenate levels by working area and add empty row
+		for (workingArea in workingAreas) {
+			levels.concat(levelsByWorkingArea[workingArea], []);
+		}
+
+		console.log("concatenated levels");
+		console.log(levels);
+		debugger;
+
+		// assign level property to each segment
+		for (i = 0; i < levels.length; i++) {
+			for (seg in levels[i]) {
+				seg.level = i;
+			}
+		}
+
+		console.log("assigned level property to segs");
+		console.log(segs);
+		debugger;
 
 		// order segments left-to-right. very important if calendar is RTL
 		for (j = 0; j < levels.length; j++) {
 			levels[j].sort(compareDaySegCols);
 		}
+
+		console.log("ordered segments left-to-right");
+		console.log(segs);
+		debugger;
 
 		return levels;
 	},

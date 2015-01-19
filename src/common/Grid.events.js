@@ -836,9 +836,32 @@ function compareNormalRanges(range1, range2) {
 // DOES NOT WORK ON INVERTED BACKGROUND EVENTS because they have no eventStartMS/eventDurationMS
 function compareSegs(seg1, seg2) {
 	return seg1.eventStartMS - seg2.eventStartMS || // earlier events go first
-		seg2.eventDurationMS - seg1.eventDurationMS || // tie? longer events go first
+		/*seg2.eventDurationMS - seg1.eventDurationMS || // tie? longer events go first*/
+		seg1.eventDurationMS - seg2.eventDurationMS || // tie? shorter events go first
+		compareShiftEvent(seg1, seg2) || // tie? shift goes first
 		seg2.event.allDay - seg1.event.allDay || // tie? put all-day events first (booleans cast to 0/1)
 		(seg1.event.title || '').localeCompare(seg2.event.title); // tie? alphabetically by title
+}
+
+// A cmp function for determining which event should be placed further on top depending on if the event
+// is a single event or a shift event.
+// BEFORE FETCHING DETAILED INFORMATION ABOUT EACH EVENT, THE PROPERTY 'SHIFT_ID' IS NOT SET! DO WE HANDLE THIS RIGHT?!
+function compareShiftEvent(seg1, seg2) {
+	if (seg1.event.hasOwnProperty("shift_id") && !seg2.event.hasOwnProperty("shift_id")) {
+		return -1;
+	} else if (!seg1.event.hasOwnProperty("shift_id") && seg2.event.hasOwnProperty("shift_id")) {
+		return 1;
+	} else if (seg1.event.hasOwnProperty("shift_id") && seg2.event.hasOwnProperty("shift_id")) {
+		if (seg1.event.shift_id > 0 && seg2.event.shift_id == 0) {
+			return -1;
+		} else if (seg1.event.shift_id == 0 && seg2.event.shift_id > 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
 }
 
 fc.compareSegs = compareSegs; // export
