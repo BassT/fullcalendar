@@ -815,7 +815,7 @@ a.fc-more:hover {
 --------------------------------------------------------------------------------------------------*/
 
 .fc-slats td {
-	height: 1.5em;
+	height: 1.0em;
 	border-bottom: 0; /* each cell is responsible for its top border */
 }
 
